@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Employee Info</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    h2 { display: inline-block; }
+    button { padding: 6px 12px; cursor: pointer; }
+
+    .add-btn {
+      float: right;
+      background: black;
+      color: white;
+      border: none;
+    }
+
+    table {
+      width: 80%;
+      margin-top: 20px;
+      border-collapse: collapse;
+    }
+
+    th {
+      background: black;
+      color: white;
+      padding: 8px;
+    }
+
+    td {
+      padding: 8px;
+      border-bottom: 1px solid #ccc;
+      text-align: center;
+    }
+
+    .del {
+      background: red;
+      color: white;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Employee Information:</h2>
+<button class="add-btn" onclick="addEmployee()">Add</button>
+
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Age</th>
+      <th>Mobile</th>
+      <th>City</th>
+      <th>Department</th>
+      <th>Salary</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody id="tableBody"></tbody>
+</table>
+
+<script>
+async function loadEmployees() {
+  const res = await fetch("/api/employees");
+  const data = await res.json();
+
+  const body = document.getElementById("tableBody");
+  body.innerHTML = "";
+
+  data.forEach(e => {
+    body.innerHTML += `
+      <tr>
+        <td>${e.id}</td>
+        <td>${e.name}</td>
+        <td>${e.age}</td>
+        <td>${e.mobile}</td>
+        <td>${e.city}</td>
+        <td>${e.department}</td>
+        <td>${e.salary}</td>
+        <td>
+          <button class="del" onclick="deleteEmp(${e.id})">Delete</button>
+        </td>
+      </tr>
+    `;
+  });
+}
+
+async function addEmployee() {
+  await fetch("/api/employees", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      name: "Vignesh",
+      age: 29,
+      mobile: "9123456789",
+      city: "Chennai",
+      department: "IT",
+      salary: 40000
+    })
+  });
+  loadEmployees();
+}
+
+async function deleteEmp(id) {
+  await fetch("/api/employees/" + id, { method: "DELETE" });
+  loadEmployees();
+}
+
+loadEmployees();
+</script>
+
+</body>
+</html>
